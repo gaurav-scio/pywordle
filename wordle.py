@@ -1,5 +1,6 @@
 #!/usr/bin/bash python
 
+import argparse
 import csv
 import random
 from typing import List, Tuple
@@ -169,7 +170,7 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
 
     # get secret word
     secret_word = get_secret_word(word_list, debug)
-    print(f"Welcome to PyWordle! \nYour secret word is {len(secret_word)} characters long. \nYou have {max_guesses} guesses.\n")
+    print(f"\nWelcome to PyWordle! \nYour secret word is {len(secret_word)} characters long. \nYou have {max_guesses} guesses.\n")
 
     # guess counter
     n_guess = 0
@@ -210,4 +211,12 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
 
 
 if __name__=="__main__":
-    play_wordle(char_min=5, char_max=5, debug=False)
+    parser = argparse.ArgumentParser(description="PyWordle")
+    parser.add_argument("--char_min", type=int, dest="char_min", default=5, help="Secret word must be at least this many characters.")
+    parser.add_argument("--char_max", type=int, dest="char_max", default=5, help="Secret word cannot exceed this many characters.")
+    parser.add_argument("--max_guesses", type=int, dest="max_guesses", default=5, help="Number of guesses you get.")
+    parser.add_argument("--debug", dest="debug", action="store_true", help="Debug mode, will show secret word.")
+    args = parser.parse_args()
+
+    # play wordle -- default is a standard game of 5 tries at a 5-character word
+    play_wordle(char_min=args.char_min, char_max=args.char_max, max_guesses=args.max_guesses, debug=args.debug)
