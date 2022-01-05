@@ -169,7 +169,7 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
 
     # get secret word
     secret_word = get_secret_word(word_list, debug)
-    print(f"Welcome to PyWordle! Your secret word is {len(secret_word)} characters. You have {max_guesses} guesses.\n")
+    print(f"Welcome to PyWordle! \nYour secret word is {len(secret_word)} characters long. \nYou have {max_guesses} guesses.\n")
 
     # guess counter
     n_guess = 0
@@ -199,6 +199,10 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
         else:
             n_guess += 1
             print(f"{max_guesses-n_guess} guesses left!\n")
+
+    # loss state
+    if not check:
+        print(f"Great try! Your word was {secret_word}.")
 
     # print final emoji result
     for row in position_emojis:
