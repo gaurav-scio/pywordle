@@ -79,7 +79,7 @@ def request_guess(secret_word:str) -> str:
     guess = input("Please make a guess: ").upper()
 
     if len(guess) != len(secret_word):
-        print(f"Guess must be {secret_word} characters. Guess again.")
+        print(f"Guess must be exactly {len(secret_word)} characters.")
         guess = request_guess(secret_word)
 
     return guess
