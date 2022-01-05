@@ -144,7 +144,7 @@ def inspect_guess(guess:str, secret_word:str) -> List[Tuple[str, str]]:
 
 
 
-def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesses:int=5, debug:bool=False):
+def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int=5, debug:bool=False):
     """Play a game of wordle.
 
     Play a game of wordle. We'll build a list of words.
@@ -154,16 +154,13 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
     we'll let them know how how they're doing.
 
     Args:
-        filepath (str):     path to TXT file with list of words [default: None]
+        filepath (str):     path to TXT file with list of words
         char_min (int):     words must be at least this many chars long [default: 4]
         char_max (int):     words cannot longer than this many chars [default: None]
         max_guesses (int):  how many guesses the user gets [default: 5]
         debug (bool):       use functions in debug mode
 
     """
-    # get default filepath
-    if not filepath:
-        filepath="google-10000-english/google-10000-english-no-swears.txt"
 
     # get word list
     word_list = build_word_list(filepath, char_min, char_max, debug)
@@ -212,6 +209,7 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="PyWordle")
+    parser.add_argument("--filepath", type=str, dest="filepath", default="google-10000-english/google-10000-english-no-swears.txt", help="List of words to use.")
     parser.add_argument("--char_min", type=int, dest="char_min", default=5, help="Secret word must be at least this many characters.")
     parser.add_argument("--char_max", type=int, dest="char_max", default=5, help="Secret word cannot exceed this many characters.")
     parser.add_argument("--max_guesses", type=int, dest="max_guesses", default=5, help="Number of guesses you get.")
@@ -219,4 +217,4 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # play wordle -- default is a standard game of 5 tries at a 5-character word
-    play_wordle(char_min=args.char_min, char_max=args.char_max, max_guesses=args.max_guesses, debug=args.debug)
+    play_wordle(filepath=args.filepath, char_min=args.char_min, char_max=args.char_max, max_guesses=args.max_guesses, debug=args.debug)

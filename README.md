@@ -7,7 +7,11 @@ You will need the list of frequent English words from [https://github.com/first2
 To play the standard 5-letter word game:
 `python wordle.py`
 
-You can modify the code to use different length words as well.
+You can modify the code to use different length words and change the number of guesses:
+`python wordle.py --char_min 4 --char_max 6 --max_guesses 6`
+
+Use debug mode to show the answer, useful for testing changes:
+`python wordle.py --debug`
 
 Example game:
 
