@@ -103,15 +103,18 @@ def check_guess(guess:str, secret_word:str) -> bool:
         return False
 
 
-def inspect_guess(guess:str, secret_word:str) -> List[Tuple[str, str]]:
+def inspect_guess(guess:str, secret_word:str, misses:List[str]=None) -> Tuple[List[Tuple[str,str]], List[str]]:
     """Inspect the parts of a guess that are correct.
 
     Args:
         guess (str):        the word the user has guessed
         secret_word (str):  the word you're trying to guess
+        misses (List[str]): a list of characters the user guessed but were incorrect
 
     Returns:
-        List[Tuple[str,str]]: returns of list of tuples of each char in guess and unicode result
+        Tuple[List[Tuple[str,str]], List[str]]: 
+            0: tuples of each char in guess and unicode result
+            1: list of characters that are not in secret word that user guessed
 
     """
     # first split the guess and secret word into list of characters
@@ -120,6 +123,10 @@ def inspect_guess(guess:str, secret_word:str) -> List[Tuple[str, str]]:
 
     # we'll bundle correct positions here
     positions = []
+
+    # characters the user guessed but are not in the word
+    if not misses: 
+        misses = []
 
     # identify correct positions
     for i, val in enumerate(zip(guess_split, secret_word_split)):
@@ -135,12 +142,13 @@ def inspect_guess(guess:str, secret_word:str) -> List[Tuple[str, str]]:
         else:
             # incorrect char -> black square
             positions.append((val[0], "\U00002B1B"))
+            misses.append(val[0])
 
     # print result to terminal
     for pos in positions:
         print(f"{pos[0]} {pos[1]}")
 
-    return positions
+    return positions, sorted(set(misses))
 
 
 
@@ -175,6 +183,7 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
     # positions to print at the end
     position_emojis = []
 
+
     # get guess and check
     while n_guess < max_guesses:
 
@@ -184,8 +193,11 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
         # check if the guess is right or wrong
         check = check_guess(guess, secret_word)
 
+        # the user hasn't guessed yet so no misses
+        if n_guess == 0: misses = None
+        
         # inspect guess and see which positions are correct
-        positions = inspect_guess(guess, secret_word)
+        positions, misses = inspect_guess(guess, secret_word, misses)
 
         # add emoji results to list
         position_emojis.append([p[1] for p in positions])
@@ -196,6 +208,7 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
             break
         else:
             n_guess += 1
+            print(f"Incorrect characters: {' '.join(misses)}")
             print(f"{max_guesses-n_guess} guesses left!\n")
 
     # loss state
