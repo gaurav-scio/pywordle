@@ -2,7 +2,7 @@
 
 import csv
 import random
-from typing import List
+from typing import List, Tuple
 
 
 def build_word_list(filepath:str, char_min:int=4, char_max:int=None, debug:bool=False) -> List[str]:
@@ -62,7 +62,7 @@ def get_secret_word(word_list:List[str], debug:bool=False) -> str:
     return secret_word
 
 
-def request_guess(char_min:int, char_max:int=None) -> str:
+def request_guess(secret_word:str) -> str:
     """Ask the user to make a guess.
 
     The user types a guess for what word they want.
@@ -71,48 +71,46 @@ def request_guess(char_min:int, char_max:int=None) -> str:
 
     Args:
         input (str):    str the user inputs
-        char_min (int): minimum length for the input
-        char_max (int): maximum length for the input [default: None]
+        secret_word (str):  the word you're trying to guess
 
     Returns
         str: the user's guess
     """
     guess = input("Please make a guess: ").upper()
 
-    if len(guess) < char_min:
-        print(f"Guess must be at least {char_min} characters. Guess again.")
-        guess = request_guess(char_min, char_max)
-    elif char_max and len(guess) > char_max:
-        print(f"Guess must not be longer than {char_max} characters. Guess again.")
-        guess = request_guess(char_min, char_max)
-    else:
-        print(f"You have guessed: {guess}")
+    if len(guess) != len(secret_word):
+        print(f"Guess must be {secret_word} characters. Guess again.")
+        guess = request_guess(secret_word)
 
     return guess
 
 
-def check_guess(guess:str, secret_word:str):
+def check_guess(guess:str, secret_word:str) -> bool:
     """Check if a guess is correct.
 
     Args:
-        guess (str):        what the user has guessed
-        secret_word (str):  the actual word
+        guess (str):        the word the user has guessed
+        secret_word (str):  the word you're trying to guess
+
+    Returns:
+        bool: True if guess is totally correct, else False
 
     """
     if guess == secret_word:
-        print("You won!")
         return True
     else:
-        print("Nope :(")
         return False
 
 
-def inspect_guess(guess:str, secret_word:str):
+def inspect_guess(guess:str, secret_word:str) -> List[Tuple[str, str]]:
     """Inspect the parts of a guess that are correct.
 
     Args:
-        guess (str):        what the user has guessed
-        secret_word (str):  the actual word
+        guess (str):        the word the user has guessed
+        secret_word (str):  the word you're trying to guess
+
+    Returns:
+        List[Tuple[str,str]]: returns of list of tuples of each char in guess and unicode result
 
     """
     # first split the guess and secret word into list of characters
@@ -124,16 +122,24 @@ def inspect_guess(guess:str, secret_word:str):
 
     # identify correct positions
     for i, val in enumerate(zip(guess_split, secret_word_split)):
+
         if val[0] == val[1]:
             # right char, right position -> green square
             positions.append((val[0], "\U0001F7E9"))
+
         elif val[0] in secret_word_split:
             # right char, wrong position -> yellow square
             positions.append((val[0], "\U0001F7E8"))
+
         else:
-            # incorrect char -> white square
-            positions.append((val[0], "\U00002B1C"))
-    print(*positions, sep="\n")
+            # incorrect char -> black square
+            positions.append((val[0], "\U00002B1B"))
+
+    # print result to terminal
+    for pos in positions:
+        print(f"{pos[0]} {pos[1]}")
+
+    return positions
 
 
 
@@ -154,7 +160,6 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
         debug (bool):       use functions in debug mode
 
     """
-
     # get default filepath
     if not filepath:
         filepath="google-10000-english/google-10000-english-no-swears.txt"
@@ -164,19 +169,41 @@ def play_wordle(filepath:str=None, char_min:int=4, char_max:int=None, max_guesse
 
     # get secret word
     secret_word = get_secret_word(word_list, debug)
+    print(f"Welcome to PyWordle! Your secret word is {len(secret_word)} characters. You have {max_guesses} guesses.\n")
+
+    # guess counter
+    n_guess = 0
+
+    # positions to print at the end
+    position_emojis = []
 
     # get guess and check
-    n_guess = 0
     while n_guess < max_guesses:
-        guess = request_guess(char_min, char_max)
-        print(f"DEBUG: {guess}")
+
+        # request that the user gueses
+        guess = request_guess(secret_word)
+
+        # check if the guess is right or wrong
         check = check_guess(guess, secret_word)
-        inspect_guess(guess, secret_word)
-        print(f"{max_guesses-n_guess-1} guesses left!\n")
-        if check: break
-        n_guess += 1
-    print("You have lost :(")
+
+        # inspect guess and see which positions are correct
+        positions = inspect_guess(guess, secret_word)
+
+        # add emoji results to list
+        position_emojis.append([p[1] for p in positions])
+
+        # if the guess is correct then break else iterate
+        if check:
+            print("\n\U0001F389 You win! \U0001F389")
+            break
+        else:
+            n_guess += 1
+            print(f"{max_guesses-n_guess} guesses left!\n")
+
+    # print final emoji result
+    for row in position_emojis:
+        print(''.join(row))
 
 
 if __name__=="__main__":
-    play_wordle(char_min=5, char_max=5, debug=True)
+    play_wordle(char_min=5, char_max=5, debug=False)
