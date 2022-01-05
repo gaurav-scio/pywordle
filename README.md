@@ -8,3 +8,6 @@ To play the standard 5-letter word game:
 `python wordle.py`
 
 You can modify the code to use different length words as well.
+
+Example game:
+![Example Game](https://github.com/gaurav-scio/pywordle/blob/main/example.png?raw=true)
