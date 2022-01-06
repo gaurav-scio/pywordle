@@ -188,7 +188,7 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
     # get guess and check
     while n_guess < max_guesses:
 
-        # request that the user gueses
+        # request that the user guesses
         guess = request_guess(secret_word)
 
         # check if the guess is right or wrong
@@ -230,5 +230,5 @@ if __name__=="__main__":
     parser.add_argument("--debug", dest="debug", action="store_true", help="Debug mode, will show secret word.")
     args = parser.parse_args()
 
-    # play wordle -- default is a standard game of 5 tries at a 5-character word
+    # play wordle -- default is a standard game of 6 tries at a 5-character word
     play_wordle(filepath=args.filepath, char_min=args.char_min, char_max=args.char_max, max_guesses=args.max_guesses, debug=args.debug)
