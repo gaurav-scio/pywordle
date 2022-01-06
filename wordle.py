@@ -152,7 +152,7 @@ def inspect_guess(guess:str, secret_word:str, misses:List[str]=None) -> Tuple[Li
 
 
 
-def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int=5, debug:bool=False):
+def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int=6, debug:bool=False):
     """Play a game of wordle.
 
     Play a game of wordle. We'll build a list of words.
@@ -165,7 +165,7 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
         filepath (str):     path to TXT file with list of words
         char_min (int):     words must be at least this many chars long [default: 4]
         char_max (int):     words cannot longer than this many chars [default: None]
-        max_guesses (int):  how many guesses the user gets [default: 5]
+        max_guesses (int):  how many guesses the user gets [default: 6]
         debug (bool):       use functions in debug mode
 
     """
@@ -175,14 +175,15 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
 
     # get secret word
     secret_word = get_secret_word(word_list, debug)
-    print(f"\nWelcome to PyWordle! \nYour secret word is {len(secret_word)} characters long. \nYou have {max_guesses} guesses.\n")
+    print(f"\nWelcome to PyWordle!") 
+    print(f"\nYour secret word is {len(secret_word)} characters long.")
+    print(f"You have {max_guesses} guesses.\n")
 
     # guess counter
     n_guess = 0
 
     # positions to print at the end
     position_emojis = []
-
 
     # get guess and check
     while n_guess < max_guesses:
@@ -225,7 +226,7 @@ if __name__=="__main__":
     parser.add_argument("--filepath", type=str, dest="filepath", default="google-10000-english/google-10000-english-no-swears.txt", help="List of words to use.")
     parser.add_argument("--char_min", type=int, dest="char_min", default=5, help="Secret word must be at least this many characters.")
     parser.add_argument("--char_max", type=int, dest="char_max", default=5, help="Secret word cannot exceed this many characters.")
-    parser.add_argument("--max_guesses", type=int, dest="max_guesses", default=5, help="Number of guesses you get.")
+    parser.add_argument("--max_guesses", type=int, dest="max_guesses", default=6, help="Number of guesses you get.")
     parser.add_argument("--debug", dest="debug", action="store_true", help="Debug mode, will show secret word.")
     args = parser.parse_args()
 
