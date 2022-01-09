@@ -1,4 +1,4 @@
-#!/usr/bin/bash python
+#!/usr/bin/env python
 
 import argparse
 import csv
