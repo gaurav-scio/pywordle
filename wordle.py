@@ -6,6 +6,7 @@ import random
 from typing import List, Tuple
 
 
+
 def build_word_list(filepath:str, char_min:int=4, char_max:int=None, debug:bool=False) -> List[str]:
     """Import list with top English words and curate it.
 
@@ -103,18 +104,20 @@ def check_guess(guess:str, secret_word:str) -> bool:
         return False
 
 
-def inspect_guess(guess:str, secret_word:str, misses:List[str]=None) -> Tuple[List[Tuple[str,str]], List[str]]:
+def inspect_guess(guess:str, secret_word:str, misses:List[str]=None, hits:List[str]=None) -> Tuple[List[Tuple[str,str]], List[str], List[str]]:
     """Inspect the parts of a guess that are correct.
 
     Args:
         guess (str):        the word the user has guessed
         secret_word (str):  the word you're trying to guess
         misses (List[str]): a list of characters the user guessed but were incorrect
+        hits (List[str]): a list of characters the user guessed that were correct
 
     Returns:
         Tuple[List[Tuple[str,str]], List[str]]: 
             0: tuples of each char in guess and unicode result
             1: list of characters that are not in secret word that user guessed
+            2: list of characters that are in the secret word that the user guessed
 
     """
     # first split the guess and secret word into list of characters
@@ -128,16 +131,22 @@ def inspect_guess(guess:str, secret_word:str, misses:List[str]=None) -> Tuple[Li
     if not misses: 
         misses = []
 
+    # characters the user guessed that are in the word
+    if not hits:
+        hits = []
+
     # identify correct positions
     for i, val in enumerate(zip(guess_split, secret_word_split)):
 
         if val[0] == val[1]:
             # right char, right position -> green square
             positions.append((val[0], "\U0001F7E9"))
+            hits.append(val[0])
 
         elif val[0] in secret_word_split:
             # right char, wrong position -> yellow square
             positions.append((val[0], "\U0001F7E8"))
+            hits.append(val[0])
 
         else:
             # incorrect char -> black square
@@ -148,8 +157,22 @@ def inspect_guess(guess:str, secret_word:str, misses:List[str]=None) -> Tuple[Li
     for pos in positions:
         print(f"{pos[0]} {pos[1]}")
 
-    return positions, sorted(set(misses))
+    return positions, sorted(set(misses)) , sorted(set(hits))
 
+
+def print_colored_letters( letter:str, misses:List[str], hits:List[str]) -> None:
+    """print the letter with a color to match if it's a hit or miss"""
+
+    if letter in misses:
+        # print the misses in red
+        print("  \033[91m {}\033[00m" .format(letter),end ="")
+    
+    elif letter in hits:
+        # print the hits in yellow
+        print("  \033[93m {}\033[00m" .format(letter),end ="")
+
+    # letter hasn't been gussed so well use the defult color
+    else: print("   " + letter,end ="")
 
 
 def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int=6, debug:bool=False):
@@ -194,11 +217,11 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
         # check if the guess is right or wrong
         check = check_guess(guess, secret_word)
 
-        # the user hasn't guessed yet so no misses
-        if n_guess == 0: misses = None
+        # the user hasn't guessed yet so no misses or hits
+        if n_guess == 0: misses = hits = None
         
         # inspect guess and see which positions are correct
-        positions, misses = inspect_guess(guess, secret_word, misses)
+        positions, misses, hits = inspect_guess(guess, secret_word, misses, hits)
 
         # add emoji results to list
         position_emojis.append([p[1] for p in positions])
@@ -209,7 +232,16 @@ def play_wordle(filepath:str, char_min:int=4, char_max:int=None, max_guesses:int
             break
         else:
             n_guess += 1
-            print(f"Incorrect characters: {' '.join(misses)}")
+
+            # creating all the leeter in the same order as they appear on the keyboard seprated by rows
+            key_board_letters = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M']]
+            for row_num in range(0,3):
+
+                # printing spaces in order to match the way the keyboard rows are skewed 
+                print(" " * row_num, end="")
+                for letter in key_board_letters[row_num]:
+                    print_colored_letters(letter, misses, hits) 
+                print("\n\n", end ="")
             print(f"{max_guesses-n_guess} guesses left!\n")
 
     # loss state
